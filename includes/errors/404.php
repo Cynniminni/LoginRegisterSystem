@@ -1,4 +1,1 @@
-<?php
-
-// part of our redirect class
-// deals with outputting errors
+Oops, that page can't be found!

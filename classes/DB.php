@@ -21,8 +21,6 @@ class DB {
 				Config::get('mysql/username'), 
 				Config::get('mysql/password')
 			);
-			
-			echo 'Connected. </br>';
 		} catch (PDOException $e) {
 			echo 'Not connected. </br>';			
 			// if connection fails, kill the application
@@ -31,9 +29,7 @@ class DB {
 		}
 	}	
 	
-	public static function getInstance() {
-		echo 'Running getInstance() </br>';
-		
+	public static function getInstance() {			
 		// if class hasn't been instantiated yet
 		if (!isset(self::$_instance)) {
 			// instantiate it
@@ -50,8 +46,7 @@ class DB {
 		
 		// check if query is prepared successfully
 		// if prepare() fails it will return false, this is how we check it
-		if ($this->_query = $this->_pdo->prepare($sql)) {
-			echo 'Successful prepare </br>';
+		if ($this->_query = $this->_pdo->prepare($sql)) {			
 			$x = 1;
 			
 			// check if there's anything in the array
@@ -63,8 +58,7 @@ class DB {
 				}
 			}
 			
-			if ($this->_query->execute()) {
-				echo 'Successful query </br>';
+			if ($this->_query->execute()) {				
 				// save the resultset using fetchAll
 				// PDO::FETCH_OBJ: returns an anonymous object with property names that 
 				// correspond to the column names returned in your result set
@@ -116,6 +110,13 @@ class DB {
 		return $this->action('DELETE', $table, $where);
 	}
 	
+	/**
+	 * Insert a row into a table in the 'login' database.
+	 * 
+	 * @param unknown $table Name of a database table.
+	 * @param unknown $fields Columns of the table.
+	 * @return boolean A boolean representing whether the insertion was successful.
+	 */
 	public function insert($table, $fields = array()) {		
 		$keys = array_keys($fields);
 		$values = null;
@@ -132,14 +133,14 @@ class DB {
 		}
 		
 		// join the keys together with `,` in between them
-		$sql = "INSERT INTO users (`" . implode('`,`', $keys) ."`) 
+		$sql = "INSERT INTO {$table} (`" . implode('`,`', $keys) ."`) 
 				VALUES ($values)";
 		
 		if (!$this->query($sql, $fields)->error()) {
+			echo $sql;
 			return true;
 		}
-		
-		echo $sql;				
+				
 		return false;
 	}
 	

@@ -17,7 +17,8 @@ $GLOBALS['config'] = array(			// put settings in global var
 		'cookie_expiry' => 604800	// how long users will be remembered
 	),
 	'session' => array(
-		'session_name' => 'user'
+		'session_name' => 'user',
+		'token_name' => 'token'
 	)
 );
 
@@ -27,3 +28,17 @@ spl_autoload_register(function($class) {
 });
 
 require_once 'functions/sanitize.php';
+
+//user has a cookie but no session (not logged in)
+if (Cookie::exists(Config::get('remember/cookie_name')) && !Session::exists(Config::get('session/session_name'))) {
+	$hash = Cookie::get(Config::get('remember/cookie_name'));
+	$hashCheck = DB::getInstance()->get('users_session', array(
+		'hash', '=', $hash
+	));
+	
+	if ($hashCheck->count()) {
+		//log the user in using user_id stored with the hash
+		$user = new User($hashCheck->first()->user_id);
+		$user->login();
+	}
+}
